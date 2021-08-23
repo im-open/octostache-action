@@ -7,8 +7,7 @@ namespace OctostacheAction
     {
         static int Main(string[] args)
         {
-            Console.WriteLine("Hi from the action");
-            Console.WriteLine($"Args: ${args.Length}");
+            Console.WriteLine($"Action Arguments ({args.Length})");
             foreach(var arg in args) {
                 Console.WriteLine(arg);
             }
@@ -17,10 +16,7 @@ namespace OctostacheAction
                 Console.WriteLine("Usage: <variableFile> <templateFile> [<outputFile>]");
                 return 1;
             }
-            if(args.Length > 3){
-                Console.WriteLine("Usage: <variableFile> <templateFile> [<outputFile>]");
-                return 1;
-            }
+            
             string variableFile = args[0];
             string templateFile = args[1];
             string outputFile = args.Length > 2 ? args[2] : null;
