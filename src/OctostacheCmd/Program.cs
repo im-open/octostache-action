@@ -11,6 +11,10 @@ namespace OctostacheAction
                 Console.WriteLine("Usage: <variableFile> <templateFile> [<outputFile>]");
                 return 1;
             }
+            if(args.Length > 3){
+                Console.WriteLine("Usage: <variableFile> <templateFile> [<outputFile>]");
+                return 1;
+            }
             string variableFile = args[0];
             string templateFile = args[1];
             string outputFile = args.Length > 2 ? args[2] : null;

@@ -12,11 +12,11 @@ inputs:
     required: true
   outputFile:
     description: 'The file the substitution results should be saved to'
-    required: true
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-  - ${{ inputs.variablesFile }}
-  - ${{ inputs.templateFile }}
-  - ${{ inputs.outputFile }}
+    - ${{ inputs.variablesFile }}
+    - ${{ inputs.templateFile }}
+    - ${{ inputs.outputFile }}
