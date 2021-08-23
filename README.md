@@ -4,7 +4,7 @@ This action will scan the file provided in the `file-with-substitutions` argumen
 
 The variable value and keys can all be placed inside of one file.  The substitution has to be performed one file at a time though.
 
-
+This is a container action so it will not work on Windows runners.
 
 ## Inputs
 
