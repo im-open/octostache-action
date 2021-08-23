@@ -7,6 +7,8 @@ namespace OctostacheAction
     {
         static int Main(string[] args)
         {
+            Console.WriteLine("Hi from the action");
+            
             if(args.Length < 2){
                 Console.WriteLine("Usage: <variableFile> <templateFile> [<outputFile>]");
                 return 1;
