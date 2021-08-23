@@ -8,7 +8,11 @@ namespace OctostacheAction
         static int Main(string[] args)
         {
             Console.WriteLine("Hi from the action");
-            
+            Console.WriteLine($"Args: ${args.Length}");
+            foreach(var arg in args) {
+                Console.WriteLine(arg);
+            }
+
             if(args.Length < 2){
                 Console.WriteLine("Usage: <variableFile> <templateFile> [<outputFile>]");
                 return 1;
