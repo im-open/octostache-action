@@ -1,0 +1,22 @@
+name: 'Octostache wrapper Action'
+description: 'A Github action to replicate the octopus variable substitution feature'
+branding:
+  icon: hash
+  color: purple
+inputs:
+  variablesFile:
+    description: 'The file that holds the variables that should be used in the substitution, defined as JSON object, e.g. {"key1":"value1","key2":"value2"}'
+    required: true
+  templateFile:
+    description: 'The template file name'
+    required: true
+  outputFile:
+    description: 'The file the substitution results should be saved to'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+  - ${{ inputs.variablesFile }}
+  - ${{ inputs.templateFile }}
+  - ${{ inputs.outputFile }}
