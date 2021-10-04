@@ -6,19 +6,21 @@ branding:
 inputs:
   variables-file:
     description: |
-      The json file that holds the variables and values to be used in the substitution.
+      An optional file containing variables to use in the substitution.
       Defined as JSON object, e.g. {"Variable1":"value1","Variable2":"value2"}
+    required: false
+  files-with-substitutions:
+    description: A comma separated list of files that contains the octo tokens needing to be substituted.
     required: true
-  file-with-substitutions:
-    description: 'The file that has substitutions to be performed.'
-    required: true
-  output-file:
-    description: 'The file the substitution results should be saved to.  Generally the same value as file-with-substitutions.'
-    required: true
+  output-files:
+    description: |
+      An optional comma separated list of files to output.
+      If defined, the program assumes the index of the output file is the same as the index of the template file in the template-files list. They therefore need to have the same number of elements.
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.variables-file }}
-    - ${{ inputs.file-with-substitutions }}
-    - ${{ inputs.output-file }}
+    - --variable-file="${{ inputs.variables-file }}"
+    - --template-files="${{ inputs.files-with-substitutions }}"
+    - --output-files="${{ inputs.output-files }}"
