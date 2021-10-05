@@ -14,18 +14,20 @@ namespace OctostacheCmd
         {
             var rootCommand = new RootCommand
             {
-                new Option<string>("--variable-file",
+                new Option<string>("--variables-file",
                     () => string.Empty,
                     "An optional file containing variables to use in the substitution."),
-                new Option<string>("--template-files",
-                    "A comma separated list of files that contains the octo tokens needing to be substituted."),
+                new Option<string>("--files-with-substitutions",
+                    "A comma separated list of files with #{variables} that need substitution."),
+
                 new Option<string>("--output-files",
                     () => string.Empty,
                     "An optional comma separated list of files to output. If defined, the program assumes the index of the output file is the same as the index of the template file in the template-files list. They therefore need to have the same number of elements.")
             };
 
             rootCommand.Description =
-                "This program takes in a list of template files, an option variable file, and an optional list of output files and performs variable substitution in the files using Octostache.";
+                "This program takes in a list of files with substitutions, an optional variables file, and an optional list of output files and performs variable substitution in the files using Octostache.";
+
 
             rootCommand.Handler = CommandHandler.Create<string, string, string>(processFile);
 
