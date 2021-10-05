@@ -1,6 +1,6 @@
 # authenticate-with-gh-package-registries
 
-This action will scan the file(s) provided in the `files-with-substitutions` argument for Octopus variable substitution syntax `#{VariableName}`.  If the files contain any `#{Variables}` that match an item in the `variables-file` or environment variables, it will replace the template with the actual value.
+This action will scan the file(s) provided in the `files-with-substitutions` argument for Octopus variable substitution syntax `#{VariableName}`.  If the files contain any `#{Variables}` that match an item in the `variables-file` or environment variables, it will replace the template with the actual value. If a variable is found in both the `variables-file` and in the environment variables, then the environment variable value will be used.
 
 This is a container action so it will not work on Windows runners.
 
@@ -67,12 +67,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: im-open/octostache-action@v1.0.0
+      - uses: im-open/octostache-action@v2.0.0
         with:
           variables-file: ./substitution-variables.json
           files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js
           output-files: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js
         env:
+          # Note that this value would be used over the value from the example variables file
           LaunchDarklyKey: ${{ secrets.LAUNCH_DARKLY_API_KEY }}
 ```
 

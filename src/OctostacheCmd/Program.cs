@@ -18,60 +18,45 @@ namespace OctostacheCmd
                     () => string.Empty,
                     "An optional file containing variables to use in the substitution."),
                 new Option<string>("--files-with-substitutions",
-                    "A comma separated list of files with #{variables} that need substitution."),
-
-                new Option<string>("--output-files",
-                    () => string.Empty,
-                    "An optional comma separated list of files to output. If defined, the program assumes the index of the output file is the same as the index of the template file in the template-files list. They therefore need to have the same number of elements.")
+                    "A comma separated list of files with #{variables} that need substitution.")
             };
 
             rootCommand.Description =
                 "This program takes in a list of files with substitutions, an optional variables file, and an optional list of output files and performs variable substitution in the files using Octostache.";
 
 
-            rootCommand.Handler = CommandHandler.Create<string, string, string>(processFile);
+            rootCommand.Handler = CommandHandler.Create<string, string>(processFile);
 
             return rootCommand.InvokeAsync(args).Result;
         }
 
-        static int processFile(string variableFile, string templateFiles, string outputFiles)
+        static int processFile(string variablesFile, string filesWithSubstitutions)
         {
-            if (string.IsNullOrEmpty(templateFiles))
+            if (string.IsNullOrEmpty(filesWithSubstitutions))
             {
                 Console.WriteLine("The template-files argument needs a value.");
                 return 1;
             }
 
             Console.WriteLine("Action Arguments");
-            if (!string.IsNullOrEmpty(variableFile))
+            if (!string.IsNullOrEmpty(variablesFile))
             {
-                Console.WriteLine(variableFile);
+                Console.WriteLine(variablesFile);
             }
-            if (!string.IsNullOrEmpty(templateFiles))
+            if (!string.IsNullOrEmpty(filesWithSubstitutions))
             {
-                Console.WriteLine(templateFiles);
-            }
-            if (!string.IsNullOrEmpty(outputFiles))
-            {
-                Console.WriteLine(outputFiles);
+                Console.WriteLine(filesWithSubstitutions);
             }
 
-            var templateFilesList = templateFiles.Split(',').Select(file => file.Trim()).ToList();
-            var outputFilesList = outputFiles.Split(',').Select(file => file.Trim()).ToList();
-
-            if (outputFilesList.Any() && outputFilesList.Count != templateFilesList.Count)
-            {
-                Console.WriteLine("The number of output files must match the number of template files. Exiting.");
-                return 1;
-            }
+            var templateFilesList = filesWithSubstitutions.Split(',').Select(file => file.Trim()).ToList();
 
 
-            var variableFileString = File.ReadAllText(variableFile);
+            var variableFileString = File.ReadAllText(variablesFile);
             var resultYamlDictionary = new YamlDotNet.Serialization.Deserializer().Deserialize<Dictionary<string, string>>(variableFileString);
 
             var varDictionary = new VariableDictionary();
 
-            Console.WriteLine($"{Environment.NewLine}Variables to use in octostache replacement found in {variableFile}:{Environment.NewLine}");
+            Console.WriteLine($"{Environment.NewLine}Variables to use in octostache replacement found in {variablesFile}:{Environment.NewLine}");
             resultYamlDictionary.ForEach(entry =>
             {
                 Console.WriteLine($"{entry.Key}: {entry.Value}");
@@ -87,11 +72,8 @@ namespace OctostacheCmd
                     varDictionary.Add(entry.Key, entry.Value);
                 });
 
-            for (var i = 0; i < templateFilesList.Count(); i++)
-            {
-                var outputFile = outputFilesList.Any() ? outputFilesList[i] : templateFilesList[i];
-                new FileSubstitution(templateFilesList[i], outputFile).DoSubstitutions(varDictionary);
-            }
+            templateFilesList.ForEach(file => FileSubstitution.DoOctostacheSubstitutions(file, varDictionary));
+
             return 0;
         }
     }

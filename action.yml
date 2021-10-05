@@ -8,17 +8,11 @@ inputs:
     description: An optional yaml file containing variables to use in the substitution.
     required: false
   files-with-substitutions:
-    description: A comma separated list of files with #{variables} that need substitution.
+    description: 'A comma separated list of files with #{variables} that need substitution.'
     required: true
-  output-files:
-    description: |
-      An optional comma separated list of files to output.
-      If defined, the program assumes the index of the output file is the same as the index of the template file in the template-files list. They therefore need to have the same number of elements.
-    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - --variable-file="${{ inputs.variables-file }}"
-    - --template-files="${{ inputs.files-with-substitutions }}"
-    - --output-files="${{ inputs.output-files }}"
+    - --variables-file="${{ inputs.variables-file }}"
+    - --files-with-substitutions="${{ inputs.files-with-substitutions }}"

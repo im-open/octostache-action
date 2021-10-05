@@ -3,27 +3,20 @@ using Octostache;
 
 namespace OctostacheCmd
 {
-    public class FileSubstitution
+    public static class FileSubstitution
     {
-        private readonly string _templateFile;
-        private readonly string _outputFile;
-
-        public FileSubstitution(string templateFile, string outputFile = "")
+        public static void DoOctostacheSubstitutions(string file, VariableDictionary variableDictionary)
         {
-            this._templateFile = templateFile;
-            this._outputFile = outputFile;
-        }
+            var output = variableDictionary.Evaluate(System.IO.File.ReadAllText(file), out string err, haltOnError: false);
 
-        public void DoSubstitutions(VariableDictionary variableDictionary)
-        {
-            var output = variableDictionary.Evaluate(System.IO.File.ReadAllText(_templateFile), out string err, haltOnError: false);
-            if (!string.IsNullOrEmpty(_outputFile))
+            if (string.IsNullOrEmpty(err))
             {
-                System.IO.File.WriteAllText(_outputFile, output);
+                System.IO.File.WriteAllText(file, output);
             }
             else
             {
-                Console.WriteLine(output);
+                Console.WriteLine($"{Environment.NewLine}An error occurred while invoking octostache's substitution:{Environment.NewLine}");
+                Console.WriteLine(err);
             }
         }
     }
