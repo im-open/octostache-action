@@ -5,7 +5,6 @@ using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
 using Octostache;
-using YamlDotNet.RepresentationModel;
 
 namespace OctostacheCmd
 {
