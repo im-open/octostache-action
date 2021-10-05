@@ -8,7 +8,7 @@ This is a container action so it will not work on Windows runners.
 
 | Parameter                  | Is Required | Description                                                                                                                                                                                                                                              |
 | -------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variables-file`           | false       | The json file that holds the variables and values to be used in the substitution.<br/>Defined as JSON object, e.g. `{"Variable1":"value1","Variable2":"value2"}`                                                                                         |
+| `variables-file`           | false       | An optional yaml file containing variables to use in the substitution.                                                                                                                                                                                   |
 | `files-with-substitutions` | true        | A comma separated list of files that contains the octo tokens needing to be substituted.                                                                                                                                                                 |
 | `output-files`             | false       | An optional comma separated list of files to output.<br/>If defined, the program assumes the index of the output file is the same as the index of the template file in the template-files list. They therefore need to have the same number of elements. |
 
@@ -20,14 +20,12 @@ No Outputs
 
 ### Variables File
 
-```json
-{
-    "Environment": "Dev",
-    "Version": "1.3.62",
-    "LaunchDarklyKey": "abc",
-    "GoogleAnalyticsKey": "123",
-    "AppInsightsKey": "a1b2c3",
-}
+```yaml
+Environment: Dev
+Version: 1.3.62
+LaunchDarklyKey: abc
+GoogleAnalyticsKey: 123
+AppInsightsKey: a1b2c3
 ```
 
 ### File with Substitution

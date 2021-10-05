@@ -5,9 +5,7 @@ branding:
   color: purple
 inputs:
   variables-file:
-    description: |
-      An optional file containing variables to use in the substitution.
-      Defined as JSON object, e.g. {"Variable1":"value1","Variable2":"value2"}
+    description: An optional yaml file containing variables to use in the substitution.
     required: false
   files-with-substitutions:
     description: A comma separated list of files that contains the octo tokens needing to be substituted.

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.IO;
 using System.Linq;
 using Octostache;
+using YamlDotNet.RepresentationModel;
 
 namespace OctostacheCmd
 {
@@ -61,10 +64,27 @@ namespace OctostacheCmd
                 return 1;
             }
 
-            var varDictionary = new VariableDictionary(variableFile);
 
+            var variableFileString = File.ReadAllText(variableFile);
+            var resultYamlDictionary = new YamlDotNet.Serialization.Deserializer().Deserialize<Dictionary<string, string>>(variableFileString);
+
+            var varDictionary = new VariableDictionary();
+
+            Console.WriteLine($"{Environment.NewLine}Variables to use in octostache replacement found in {variableFile}:{Environment.NewLine}");
+            resultYamlDictionary.ForEach(entry =>
+            {
+                Console.WriteLine($"{entry.Key}: {entry.Value}");
+                varDictionary.Add(entry.Key, entry.Value);
+            });
+
+
+            Console.WriteLine($"{Environment.NewLine}Environment variables to use in octostache replacement:{Environment.NewLine}");
             EnvironmentVariableRetriever.GetAllVariables()
-                .ForEach(keyValuePair => varDictionary.Add(keyValuePair.Key, keyValuePair.Value));
+                .ForEach(entry =>
+                {
+                    Console.WriteLine($"{entry.Key}: {entry.Value}");
+                    varDictionary.Add(entry.Key, entry.Value);
+                });
 
             for (var i = 0; i < templateFilesList.Count(); i++)
             {
