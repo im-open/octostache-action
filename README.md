@@ -1,18 +1,16 @@
 # authenticate-with-gh-package-registries
 
-This action will scan the file provided in the `file-with-substitutions` argument for Octopus variable substitution syntax `#{VariableName}`.  If it finds a matching variable in the `variables-file`, it will replace the template with the actual value.
-
-The variable value and keys can all be placed inside of one file.  The substitution has to be performed one file at a time though.
+This action will scan the file(s) provided in the `files-with-substitutions` argument for Octopus variable substitution syntax `#{VariableName}`.  If the files contain any `#{Variables}` that match an item in the `variables-file` or environment variables, it will replace the template with the actual value. If a variable is found in both the `variables-file` and in the environment variables, then the environment variable value will be used.
 
 This is a container action so it will not work on Windows runners.
 
 ## Inputs
 
-| Parameter                 | Is Required | Description                                                                                                                                                      |
-| ------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variables-file`          | true        | The json file that holds the variables and values to be used in the substitution.<br/>Defined as JSON object, e.g. `{"Variable1":"value1","Variable2":"value2"}` |
-| `file-with-substitutions` | true        | The file that has substitutions to be performed.                                                                                                                 |
-| `output-file`             | true        | The file the substitution results should be saved to.  This is generally the same value provided in `file-with-substitutions`.                                   |
+| Parameter                  | Is Required | Description                                                                                                                                                                                                                                              |
+| -------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variables-file`           | false       | An optional yaml file containing variables to use in the substitution.                                                                                                                                                                                   |
+| `files-with-substitutions` | true        | A comma separated list of files with `#{variables}` that need substitution.                                                                                                                                                                 |
+| `output-files`             | false       | An optional comma separated list of files to output.<br/>If defined, the program assumes the index of the output file is the same as the index of the template file in the template-files list. They therefore need to have the same number of elements. |
 
 ## Outputs
 
@@ -22,14 +20,12 @@ No Outputs
 
 ### Variables File
 
-```json
-{
-    "Environment": "Dev",
-    "Version": "1.3.62",
-    "LaunchDarklyKey": "abc",
-    "GoogleAnalyticsKey": "123",
-    "AppInsightsKey": "a1b2c3",
-}
+```yaml
+Environment: Dev
+Version: 1.3.62
+LaunchDarklyKey: abc
+GoogleAnalyticsKey: 123
+AppInsightsKey: a1b2c3
 ```
 
 ### File with Substitution
@@ -71,17 +67,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: im-open/octostache-action@v1.0.0
+      - uses: im-open/octostache-action@v2.0.0
         with:
-          variablesFile: ./substitution-variables.json
-          templateFile: ./src/DemoApp19/DemoApp19.csproj
-          outputFile: ./src/DemoApp19/DemoApp19.csproj
-
-      - uses: im-open/octostache-action@v1.0.0
-        with:
-          variablesFile: ./substitution-variables.json
-          templateFile: ./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js
-          outputFile: ./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js
+          variables-file: ./substitution-variables.json
+          files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js
+          output-files: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js
+        env:
+          # Note that this value would be used over the value from the example variables file
+          LaunchDarklyKey: ${{ secrets.LAUNCH_DARKLY_API_KEY }}
 ```
 
 

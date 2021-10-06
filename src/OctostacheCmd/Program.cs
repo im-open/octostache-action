@@ -1,33 +1,79 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.IO;
+using System.Linq;
 using Octostache;
 
-namespace OctostacheAction
+namespace OctostacheCmd
 {
     class Program
     {
         static int Main(string[] args)
         {
-            Console.WriteLine($"Action Arguments ({args.Length})");
-            foreach(var arg in args) {
-                Console.WriteLine(arg);
-            }
+            var rootCommand = new RootCommand
+            {
+                new Option<string>("--variables-file",
+                    () => string.Empty,
+                    "An optional file containing variables to use in the substitution."),
+                new Option<string>("--files-with-substitutions",
+                    "A comma separated list of files with #{variables} that need substitution.")
+            };
 
-            if(args.Length < 2){
-                Console.WriteLine("Usage: <variableFile> <templateFile> [<outputFile>]");
+            rootCommand.Description =
+                "This program takes in a list of files with substitutions, an optional variables file, and an optional list of output files and performs variable substitution in the files using Octostache.";
+
+
+            rootCommand.Handler = CommandHandler.Create<string, string>(processFile);
+
+            return rootCommand.InvokeAsync(args).Result;
+        }
+
+        static int processFile(string variablesFile, string filesWithSubstitutions)
+        {
+            if (string.IsNullOrEmpty(filesWithSubstitutions))
+            {
+                Console.WriteLine("The template-files argument needs a value.");
                 return 1;
             }
-            
-            string variableFile = args[0];
-            string templateFile = args[1];
-            string outputFile = args.Length > 2 ? args[2] : null;
 
-            var varDictionary = new VariableDictionary(variableFile);
-            var output = varDictionary.Evaluate(System.IO.File.ReadAllText(templateFile), out string err, haltOnError: false);
-            if(outputFile != null){
-                System.IO.File.WriteAllText(outputFile, output);
-            }else{  // Output to console
-                Console.WriteLine(output);
+            Console.WriteLine("Action Arguments");
+            if (!string.IsNullOrEmpty(variablesFile))
+            {
+                Console.WriteLine(variablesFile);
             }
+            if (!string.IsNullOrEmpty(filesWithSubstitutions))
+            {
+                Console.WriteLine(filesWithSubstitutions);
+            }
+
+            var templateFilesList = filesWithSubstitutions.Split(',').Select(file => file.Trim()).ToList();
+
+
+            var variableFileString = File.ReadAllText(variablesFile);
+            var resultYamlDictionary = new YamlDotNet.Serialization.Deserializer().Deserialize<Dictionary<string, string>>(variableFileString);
+
+            var varDictionary = new VariableDictionary();
+
+            Console.WriteLine($"{Environment.NewLine}Variables to use in octostache replacement found in {variablesFile}:{Environment.NewLine}");
+            resultYamlDictionary.ForEach(entry =>
+            {
+                Console.WriteLine($"{entry.Key}: {entry.Value}");
+                varDictionary.Add(entry.Key, entry.Value);
+            });
+
+
+            Console.WriteLine($"{Environment.NewLine}Environment variables to use in octostache replacement:{Environment.NewLine}");
+            EnvironmentVariableRetriever.GetAllVariables()
+                .ForEach(entry =>
+                {
+                    Console.WriteLine($"{entry.Key}: {entry.Value}");
+                    varDictionary.Add(entry.Key, entry.Value);
+                });
+
+            templateFilesList.ForEach(file => FileSubstitution.DoOctostacheSubstitutions(file, varDictionary));
+
             return 0;
         }
     }
