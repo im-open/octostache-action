@@ -1,4 +1,4 @@
-# authenticate-with-gh-package-registries
+# octostache-action
 
 This action will scan the file(s) provided in the `files-with-substitutions` argument for Octopus variable substitution syntax `#{VariableName}`.  If the files contain any `#{Variables}` that match an item in the `variables-file` or environment variables, it will replace the template with the actual value. If a variable is found in both the `variables-file` and in the environment variables, then the environment variable value will be used.
 
@@ -9,7 +9,7 @@ This is a container action so it will not work on Windows runners.
 | Parameter                  | Is Required | Description                                                                                                                                                                                                                                              |
 | -------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `variables-file`           | false       | An optional yaml file containing variables to use in the substitution.                                                                                                                                                                                   |
-| `files-with-substitutions` | true        | A comma separated list of files with `#{variables}` that need substitution.                                                                                                                                                                 |
+| `files-with-substitutions` | true        | A comma separated list of files with `#{variables}` that need substitution.                                                                                                                                                                              |
 | `output-files`             | false       | An optional comma separated list of files to output.<br/>If defined, the program assumes the index of the output file is the same as the index of the template file in the template-files list. They therefore need to have the same number of elements. |
 
 ## Outputs
@@ -19,7 +19,7 @@ No Outputs
 ## Usage Example
 
 ### Variables File
-
+When using the `variables-file` argument, this is the structure of the file containing the variable names and values that will be substituted.
 ```yaml
 Environment: Dev
 Version: 1.3.62
@@ -28,7 +28,13 @@ GoogleAnalyticsKey: 123
 AppInsightsKey: a1b2c3
 ```
 
-### File with Substitution
+### Environment Variables
+In addition to the `variables-file` argument, substitutions can be provided in the `env:` section of the action.  The format matches what is supplied in the `variables-file`: `<var-name>: <var-value>`.  
+
+If the same item is provided in the `variables-file` and the `env:` section, the value in the `env:` section will be used.
+
+### Example Files that contain Octostache Substitution Syntax
+These are some sample files that contain the Octostache substitution syntax `#{}`.  These files would be included in the `files-with-substitutions` argument above.
 
 `DemoApp19.csproj`
 ```xml
@@ -67,7 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: im-open/octostache-action@v2.0.0
+      - uses: im-open/octostache-action@v2.0.1
         with:
           variables-file: ./substitution-variables.json
           files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js

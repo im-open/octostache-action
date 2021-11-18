@@ -50,19 +50,20 @@ namespace OctostacheCmd
 
             var templateFilesList = filesWithSubstitutions.Split(',').Select(file => file.Trim()).ToList();
 
-
-            var variableFileString = File.ReadAllText(variablesFile);
-            var resultYamlDictionary = new YamlDotNet.Serialization.Deserializer().Deserialize<Dictionary<string, string>>(variableFileString);
-
             var varDictionary = new VariableDictionary();
 
-            Console.WriteLine($"{Environment.NewLine}Variables to use in octostache replacement found in {variablesFile}:{Environment.NewLine}");
-            resultYamlDictionary.ForEach(entry =>
+            if (!string.IsNullOrEmpty(variablesFile))
             {
-                Console.WriteLine($"{entry.Key}: {entry.Value}");
-                varDictionary.Add(entry.Key, entry.Value);
-            });
+                var variableFileString = File.ReadAllText(variablesFile);
+                var resultYamlDictionary = new YamlDotNet.Serialization.Deserializer().Deserialize<Dictionary<string, string>>(variableFileString);
 
+                Console.WriteLine($"{Environment.NewLine}Variables to use in octostache replacement found in {variablesFile}:{Environment.NewLine}");
+                resultYamlDictionary.ForEach(entry =>
+                {
+                    Console.WriteLine($"{entry.Key}: {entry.Value}");
+                    varDictionary.Add(entry.Key, entry.Value);
+                });
+            }
 
             Console.WriteLine($"{Environment.NewLine}Environment variables to use in octostache replacement:{Environment.NewLine}");
             EnvironmentVariableRetriever.GetAllVariables()
