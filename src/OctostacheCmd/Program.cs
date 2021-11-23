@@ -50,7 +50,7 @@ namespace OctostacheCmd
 
             var templateFilesList = FilesRetriever.GetFiles(filesWithSubstitutions).ToList();
             Console.WriteLine(
-                $"{Environment.NewLine}Files found in which make substitutions:{Environment.NewLine}");
+                $"{Environment.NewLine}Files found in which to make substitutions:{Environment.NewLine}");
             foreach (var templateFile in templateFilesList)
             {
                 Console.WriteLine(templateFile);

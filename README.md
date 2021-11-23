@@ -9,8 +9,7 @@ This is a container action so it will not work on Windows runners.
 | Parameter                  | Is Required | Description                                                                                                                                                                                                                                              |
 | -------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `variables-file`           | false       | An optional yaml file containing variables to use in the substitution.                                                                                                                                                                                   |
-| `files-with-substitutions` | true        | A comma separated list of files with `#{variables}` that need substitution.                                                                                                                                                                              |
-| `output-files`             | false       | An optional comma separated list of files to output.<br/>If defined, the program assumes the index of the output file is the same as the index of the template file in the template-files list. They therefore need to have the same number of elements. |
+| `files-with-substitutions` | true        | A comma separated list of files or [.NET-compatible glob patterns](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.filesystemglobbing.matcher?view=dotnet-plat-ext-6.0#remarks) with `#{variables}` that need substitution.                                                                                                                                                                              |
 
 ## Outputs
 
@@ -29,7 +28,7 @@ AppInsightsKey: a1b2c3
 ```
 
 ### Environment Variables
-In addition to the `variables-file` argument, substitutions can be provided in the `env:` section of the action.  The format matches what is supplied in the `variables-file`: `<var-name>: <var-value>`.  
+In addition to the `variables-file` argument, substitutions can be provided in the `env:` section of the action.  The format matches what is supplied in the `variables-file`: `<var-name>: <var-value>`.
 
 If the same item is provided in the `variables-file` and the `env:` section, the value in the `env:` section will be used.
 
@@ -59,6 +58,19 @@ const substitutionVariables = {
 };
 ```
 
+`index.html`
+```html
+<html>
+  <head>
+    <!--... head items ...-->
+    <script type="text/javascript">var gaKey = '#{GoogleAnalyticsKey}';</script>
+  </head>
+  <body>
+    <!--... application body ...-->
+  </body>
+</html>
+```
+
 ### Workflow
 
 ```yml
@@ -76,8 +88,7 @@ jobs:
       - uses: im-open/octostache-action@v2.0.1
         with:
           variables-file: ./substitution-variables.json
-          files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js
-          output-files: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js
+          files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js,./src/**/*.html
         env:
           # Note that this value would be used over the value from the example variables file
           LaunchDarklyKey: ${{ secrets.LAUNCH_DARKLY_API_KEY }}
