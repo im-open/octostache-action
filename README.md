@@ -85,7 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: im-open/octostache-action@v2.0.1
+      - uses: im-open/octostache-action@v2.1.0
         with:
           variables-file: ./substitution-variables.json
           files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js,./src/**/*.html
