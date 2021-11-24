@@ -4,6 +4,8 @@ This action will scan the file(s) provided in the `files-with-substitutions` arg
 
 This is a container action so it will not work on Windows runners.
 
+## Index
+
 - [Inputs](#inputs)
 - [Outputs](#outputs)
 - [Usage Example](#usage-example)
@@ -18,10 +20,10 @@ This is a container action so it will not work on Windows runners.
 
 ## Inputs
 
-| Parameter                  | Is Required | Description                                                                                                                                                                                                                                              |
-| -------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variables-file`           | false       | An optional yaml file containing variables to use in the substitution.                                                                                                                                                                                   |
-| `files-with-substitutions` | true        | A comma separated list of files or [.NET-compatible glob patterns](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.filesystemglobbing.matcher?view=dotnet-plat-ext-6.0#remarks) with `#{variables}` that need substitution.                                                                                                                                                                              |
+| Parameter                  | Is Required | Description                                                                                                                                                                                                                                  |
+| -------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variables-file`           | false       | An optional yaml file containing variables to use in the substitution.                                                                                                                                                                       |
+| `files-with-substitutions` | true        | A comma separated list of files or [.NET-compatible glob patterns](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.filesystemglobbing.matcher?view=dotnet-plat-ext-6.0#remarks) with `#{variables}` that need substitution. |
 
 ## Outputs
 
