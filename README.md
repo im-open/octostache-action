@@ -4,6 +4,18 @@ This action will scan the file(s) provided in the `files-with-substitutions` arg
 
 This is a container action so it will not work on Windows runners.
 
+- [Inputs](#inputs)
+- [Outputs](#outputs)
+- [Usage Example](#usage-example)
+  - [Variables File](#variables-file)
+  - [Environment Variables](#environment-variables)
+  - [Example Files that contain Octostache Substitution Syntax](#example-files-that-contain-octostache-substitution-syntax)
+  - [Workflow](#workflow)
+- [Contributing](#contributing)
+  - [Incrementing the Version](#incrementing-the-version)
+- [Code of Conduct](#code-of-conduct)
+- [License](#license)
+
 ## Inputs
 
 | Parameter                  | Is Required | Description                                                                                                                                                                                                                                              |
@@ -95,6 +107,24 @@ jobs:
 ```
 
 
+## Contributing
+
+When creating new PRs please ensure:
+1. For major or minor changes, at least one of the commit messages contains the appropriate `+semver:` keywords listed under [Incrementing the Version](#incrementing-the-version).
+2. The `README.md` example has been updated with the new version.  See [Incrementing the Version](#incrementing-the-version).
+3. The action code does not contain sensitive information.
+
+### Incrementing the Version
+
+This action uses [git-version-lite] to examine commit messages to determine whether to perform a major, minor or patch increment on merge.  The following table provides the fragment that should be included in a commit message to active different increment strategies.
+| Increment Type | Commit Message Fragment                     |
+| -------------- | ------------------------------------------- |
+| major          | +semver:breaking                            |
+| major          | +semver:major                               |
+| minor          | +semver:feature                             |
+| minor          | +semver:minor                               |
+| patch          | *default increment type, no comment needed* |
+
 ## Code of Conduct
 
 This project has adopted the [im-open's Code of Conduct](https://github.com/im-open/.github/blob/master/CODE_OF_CONDUCT.md).
@@ -103,6 +133,7 @@ This project has adopted the [im-open's Code of Conduct](https://github.com/im-o
 
 Copyright &copy; 2021, Extend Health, LLC. Code released under the [MIT license](LICENSE).
 
+[git-version-lite]: https://github.com/im-open/git-version-lite
 [Authenticating to GitHub Packages - nuget]: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry#authenticating-to-github-packages
 [dotnet nuget add source]: https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-add-source
 [Authenticating to GitHub Packages - npm]: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages
