@@ -48,7 +48,14 @@ namespace OctostacheCmd
                 Console.WriteLine(filesWithSubstitutions);
             }
 
-            var templateFilesList = filesWithSubstitutions.Split(',').Select(file => file.Trim()).ToList();
+            var templateFilesList = FilesRetriever.GetFiles(filesWithSubstitutions).ToList();
+            Console.WriteLine(
+                $"{Environment.NewLine}Files found in which to make substitutions:{Environment.NewLine}");
+            foreach (var templateFile in templateFilesList)
+            {
+                Console.WriteLine(templateFile);
+            }
+
 
             var varDictionary = new VariableDictionary();
 
