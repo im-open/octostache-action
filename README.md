@@ -6,6 +6,7 @@ This is a container action so it will not work on Windows runners.
 
 ## Index
 
+- [Index](#index)
 - [Inputs](#inputs)
 - [Outputs](#outputs)
 - [Usage Example](#usage-example)
@@ -99,7 +100,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: im-open/octostache-action@v2.1.1
+      - uses: im-open/octostache-action@v3.0.0
         with:
           variables-file: ./substitution-variables.json
           files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js,./src/**/*.html
