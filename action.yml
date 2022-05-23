@@ -11,8 +11,11 @@ inputs:
     description: 'A comma separated list of files with #{variables} that need substitution.'
     required: true
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - --variables-file="${{ inputs.variables-file }}"
-    - --files-with-substitutions="${{ inputs.files-with-substitutions }}"
+  using: 'composite'
+  steps:
+    - name: Run the octostash project
+      shell: pwsh
+      run: |
+        $executablePath = if($IsWindows) { "${{ github.action_path }}/.build-win/OctostacheCmd.exe" } else { "${{ github.action_path }}/.build-linux/OctostacheCmd.exe" }
+
+        Invoke-Expression "$executablePath --variables-file `"${{ inputs.variables-file }}`" --files-with-substitutions `"${{ inputs.files-with-substitutions }}`""
