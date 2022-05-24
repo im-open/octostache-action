@@ -6,18 +6,20 @@ This is a container action so it will not work on Windows runners.
 
 ## Index
 
-- [Index](#index)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
-- [Usage Example](#usage-example)
-  - [Variables File](#variables-file)
-  - [Environment Variables](#environment-variables)
-  - [Example Files that contain Octostache Substitution Syntax](#example-files-that-contain-octostache-substitution-syntax)
-  - [Workflow](#workflow)
-- [Contributing](#contributing)
-  - [Incrementing the Version](#incrementing-the-version)
-- [Code of Conduct](#code-of-conduct)
-- [License](#license)
+- [octostache-action](#octostache-action)
+  - [Index](#index)
+  - [Inputs](#inputs)
+  - [Outputs](#outputs)
+  - [Usage Example](#usage-example)
+    - [Variables File](#variables-file)
+    - [Environment Variables](#environment-variables)
+    - [Example Files that contain Octostache Substitution Syntax](#example-files-that-contain-octostache-substitution-syntax)
+    - [Workflow](#workflow)
+  - [Contributing](#contributing)
+    - [Recompiling](#recompiling)
+    - [Incrementing the Version](#incrementing-the-version)
+  - [Code of Conduct](#code-of-conduct)
+  - [License](#license)
 
 ## Inputs
 
@@ -100,7 +102,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: im-open/octostache-action@v3.0.0
+      - uses: im-open/octostache-action@v4.0.0
         with:
           variables-file: ./substitution-variables.json
           files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js,./src/**/*.html
@@ -113,9 +115,24 @@ jobs:
 ## Contributing
 
 When creating new PRs please ensure:
-1. For major or minor changes, at least one of the commit messages contains the appropriate `+semver:` keywords listed under [Incrementing the Version](#incrementing-the-version).
-2. The `README.md` example has been updated with the new version.  See [Incrementing the Version](#incrementing-the-version).
-3. The action code does not contain sensitive information.
+1. The action has been recompiled.  See the [Recompiling](#recompiling) section below for more details.
+w. For major or minor changes, at least one of the commit messages contains the appropriate `+semver:` keywords listed under [Incrementing the Version](#incrementing-the-version).
+3. The `README.md` example has been updated with the new version.  See [Incrementing the Version](#incrementing-the-version).
+4. The action code does not contain sensitive information.
+
+### Recompiling
+
+If changes are made to the action's code in this repository, or its dependencies, you will need to re-compile the action.
+
+```sh
+# Installs dependencies
+npm install
+
+# Build the code
+npm run build
+```
+
+The `build` command builds the code for both windows and linux operating systems. These changes will be committed so the action can utilize the built executables at run time.
 
 ### Incrementing the Version
 
