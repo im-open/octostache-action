@@ -16,9 +16,9 @@ namespace OctostacheCmd
             {
                 new Option<string>("--variables-file",
                     () => string.Empty,
-                    "An optional file containing variables to use in the substitution."),
+                    "An optional file containing variables to use in the substitution.") { IsRequired = false },
                 new Option<string>("--files-with-substitutions",
-                    "A comma separated list of files with #{variables} that need substitution.")
+                    "A comma separated list of files with #{variables} that need substitution.") { IsRequired = true }
             };
 
             rootCommand.Description =

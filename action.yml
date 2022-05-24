@@ -16,6 +16,15 @@ runs:
     - name: Run the octostash project
       shell: pwsh
       run: |
-        $executablePath = if($IsWindows) { "${{ github.action_path }}/.build-win/OctostacheCmd.exe" } else { "${{ github.action_path }}/.build-linux/OctostacheCmd.exe" }
+        $executablePath = if ($IsWindows) { "${{ github.action_path }}/.build-win/OctostacheCmd.exe" } else { "${{ github.action_path }}/.build-linux/OctostacheCmd" }
 
-        Invoke-Expression "$executablePath --variables-file `"${{ inputs.variables-file }}`" --files-with-substitutions `"${{ inputs.files-with-substitutions }}`""
+        if (!$IsWindows) {
+          chmod 777 $executablePath
+        }
+
+        if ("${{ inputs.variables-file }}") {
+          Invoke-Expression "$executablePath --variables-file `"${{ inputs.variables-file }}`" --files-with-substitutions `"${{ inputs.files-with-substitutions }}`""
+        }
+        else {
+          Invoke-Expression "$executablePath --files-with-substitutions `"${{ inputs.files-with-substitutions }}`""
+        }
