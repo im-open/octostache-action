@@ -108,7 +108,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-
+      
+      # You may also reference just the major or major.minor version
       - uses: im-open/octostache-action@v4.0.0
         with:
           variables-file: ./substitution-variables.json
