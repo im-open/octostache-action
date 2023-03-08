@@ -1,8 +1,10 @@
-name: 'Octostache wrapper Action'
-description: 'A Github action to replicate the octopus variable substitution feature'
+name: Octostache wrapper Action
+description: A Github action to replicate the octopus variable substitution feature
+
 branding:
   icon: hash
   color: purple
+  
 inputs:
   variables-file:
     description: An optional yaml file containing variables to use in the substitution.
@@ -10,6 +12,7 @@ inputs:
   files-with-substitutions:
     description: 'A comma separated list of files with #{variables} that need substitution.'
     required: true
+    
 runs:
   using: 'composite'
   steps:
