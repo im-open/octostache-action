@@ -59,3 +59,24 @@ jobs:
           git push origin ${{ steps.version.outputs.NEXT_MAJOR_VERSION }} -f
           git push origin ${{ steps.version.outputs.NEXT_MINOR_VERSION }} -f
 
+      - name: Create tag for Linux - non-self contained
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          
+          git branch -D linux
+          git checkout -b linux
+          rm -fdr .build-win
+          rm -fdr .build-linux
+          dotnet publish "./src/OctostacheCmd/OctostacheCmd.csproj" -c Release -o "./.build-linux" -r linux-x64 --no-self-contained
+
+          git add .
+          git commit -m "Add Linux non-self contained build"
+          git push
+          
+          git tag linux-${{ steps.version.outputs.NEXT_VERSION }} HEAD
+          git tag -f linux-${{ steps.version.outputs.NEXT_MAJOR_VERSION }} ${{ github.sha }}
+          git tag -f linux-${{ steps.version.outputs.NEXT_MINOR_VERSION }} ${{ github.sha }}
+          git push origin linux-${{ steps.version.outputs.NEXT_VERSION }}
+          git push origin linux-${{ steps.version.outputs.NEXT_MAJOR_VERSION }} -f
+          git push origin linux-${{ steps.version.outputs.NEXT_MINOR_VERSION }} -f
