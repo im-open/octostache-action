@@ -1,5 +1,5 @@
 name: Octostache wrapper Action
-description: A Github action to replicate the octopus variable substitution feature
+description: A Github action to replicate the octopus variable substitution feature.  Change to the source code.
 
 branding:
   icon: hash
