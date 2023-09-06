@@ -31,3 +31,4 @@ runs:
         else {
           Invoke-Expression "$executablePath --files-with-substitutions `"${{ inputs.files-with-substitutions }}`""
         }
+        echo "Test out a source code change"
