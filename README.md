@@ -111,7 +111,7 @@ jobs:
       - uses: actions/checkout@v3
       
       # You may also reference just the major or major.minor version
-      - uses: im-open/octostache-action@v4.0.2
+      - uses: im-open/octostache-action@v4.0.3
         with:
           variables-file: ./substitution-variables.json
           files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js,./src/**/*.html
