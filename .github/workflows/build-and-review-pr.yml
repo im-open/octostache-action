@@ -57,6 +57,7 @@ jobs:
       # ** This value must match the same dirs-with-code argument specified in increment-version-on-merge.yml.
       dirs-with-code: 'src,.build-linux,.build-win'
 
-      # The npm script to run to build the action.  This is typically 'npm run build' if the
-      # action needs to be compiled.  For composite-run-steps actions this is typically empty.
-      build-command: 'npm run build'
+      # This action does contain a build step but it always results in changes to the dlls, whether or not there 
+      # were actually code changes, so skip the build here.  When PRs are created, we need to make sure the
+      # dlls have actually been updated.
+      build-command: ''
