@@ -1,3 +1,12 @@
+# Deprecated :warning:
+
+This action is superseded by https://github.com/im-open/template-render-action.
+
+If a simple substituation is required, instead of using this action, a one-line bash command using [envsubst](https://www.man7.org/linux/man-pages/man1/envsubst.1.html) will suffice.
+```
+- run: envsubst < "source.txt" > "destination.txt"
+```
+
 # octostache-action
 
 This action will scan the file(s) provided in the `files-with-substitutions` argument for Octopus variable substitution syntax `#{VariableName}`. If the files contain any `#{Variables}` that match an item in the `variables-file` or environment variables, it will replace the template with the actual value. If a variable is found in both the `variables-file` and in the environment variables, then the environment variable value will be used.
