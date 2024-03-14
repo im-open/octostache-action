@@ -73,6 +73,11 @@ jobs:
         os: [ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
+    
+    defaults:
+      run:
+        shell: bash
+
     env:
       JOB_LEVEL_ENV: 'job-level-env' # Used in the tests
 
