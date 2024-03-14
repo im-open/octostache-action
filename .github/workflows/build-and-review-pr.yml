@@ -21,6 +21,9 @@ on:
   #   without disabling that requirement.  If we have a status check that is always produced,
   #   we can also use that to require all branches be up to date before they are merged.
 
+env:
+  WORKFLOW_LEVEL_ENV: 'workflow-level-env' # Used in the tests
+
 jobs:
   build-and-review-pr:
     # This reusable workflow will check to see if an action's source code has changed based on
@@ -57,7 +60,295 @@ jobs:
       # ** This value must match the same dirs-with-code argument specified in increment-version-on-merge.yml.
       dirs-with-code: 'src,.build-linux,.build-win'
 
-      # This action does contain a build step but it always results in changes to the dlls, whether or not there 
+      # This action does contain a build step but it always results in changes to the dlls, whether or not there
       # were actually code changes, so skip the build here.  When PRs are created, we need to make sure the
       # dlls have actually been updated.
       build-command: ''
+
+  unit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        # There are diferent executables for windows/linux so try it on both
+        os: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+    env:
+      JOB_LEVEL_ENV: 'job-level-env' # Used in the tests
+
+      # These env vars are reused and set for each test scenario
+      FILE_WITH_SUBSTITUTIONS: ''
+      ORIGINAL_FILE: ''
+      EXPECTED_OUTPUT_FILE: ''
+
+    steps:
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                                    SETUP                                                    '
+        run: echo ""
+
+      - name: Setup - Checkout the action
+        uses: actions/checkout@v4
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                 TEST 1 - EMPTY FILES-WITH-SUBSTITUTIONS ARG                                 '
+        run: echo ""
+
+      - name: 1a - When octostache-action is called with an empty files-with-substitutions
+        id: missing-arg
+        if: always()
+        continue-on-error: true # This is needed because we expect the step to fail but we need it to "pass" in order for the test job to succeed.
+        uses: ./
+        with:
+          files-with-substitutions: '  '
+
+      - name: 1b - Then the action outcome should be failure
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "failure" --actual "${{ steps.missing-arg.outcome }}"
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                 TEST 2 - FILE WITH NO OCTOSTACHE TEMPLATES                                  '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 2
+        if: always()
+        run: |
+          destinationDirectory="./test-results/no-templates"
+          fileName="no-octostache-templates.html"
+          expectedOutputFile="./test/expected-output/no-templates.html"
+
+          # Create a directory and copy the file to the destination
+          # Make a copy so octostache can modify the file without changing the original
+          destinationFile="$destinationDirectory/$fileName"
+          originalFile="./test/input-files/$fileName"
+          mkdir -p $destinationDirectory
+          cp $originalFile $destinationFile
+
+          echo "FILE_WITH_SUBSTITUTIONS=$destinationFile" >> "$GITHUB_ENV"
+          echo "ORIGINAL_FILE=$originalFile" >> "$GITHUB_ENV"
+          echo "EXPECTED_OUTPUT_FILE=$expectedOutputFile" >> "$GITHUB_ENV"
+
+      - name: 2a - When octostache-action is called with a file that has no octostache templates to replace
+        id: no-templates
+        if: always()
+        uses: ./
+        with:
+          files-with-substitutions: ${{ env.FILE_WITH_SUBSTITUTIONS }}
+
+      - name: 2b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.no-templates.outcome }}"
+
+      - name: 2c - And '${{ env.FILE_WITH_SUBSTITUTIONS }}' should match the expected file, which is the same as the original file
+        if: always()
+        run: |
+          expectedFileName="${{ env.EXPECTED_OUTPUT_FILE }}"
+          actualFileName="${{ env.FILE_WITH_SUBSTITUTIONS }}"
+          ./test/assert-file-contents-match.sh --expectedFileName $expectedFileName --actualFileName $actualFileName
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                             TEST 3 - FILE WITH NO MATCHING OCTOSTACHE TEMPLATES                             '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 3
+        if: always()
+        run: |
+          destinationDirectory="./test-results/no-matches"
+          fileName="no-matching-templates.html"
+          expectedOutputFile="./test/expected-output/no-matching.html"
+
+          # Create a directory and copy the file to the destination
+          # Make a copy so octostache can modify the file without changing the original
+          destinationFile="$destinationDirectory/$fileName"
+          originalFile="./test/input-files/$fileName"
+          mkdir -p $destinationDirectory
+          cp $originalFile $destinationFile
+
+          echo "FILE_WITH_SUBSTITUTIONS=$destinationFile" >> "$GITHUB_ENV"
+          echo "ORIGINAL_FILE=$originalFile" >> "$GITHUB_ENV"
+          echo "EXPECTED_OUTPUT_FILE=$expectedOutputFile" >> "$GITHUB_ENV"
+
+      - name: 3a - When octostache-action is called with a file that has octostache templates that do not match any inputs
+        id: no-matching-templates
+        if: always()
+        uses: ./
+        with:
+          files-with-substitutions: ${{ env.FILE_WITH_SUBSTITUTIONS }}
+          variables-file: ./test/input-files/substitution-variables.yml #(LaunchDarklyKey,GoogleAnalyticsKey,AppInsightsKey)
+        env:
+          Environment: Stage
+          Version: 1.3.62
+
+      - name: 3b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.no-matching-templates.outcome }}"
+
+      - name: 3c - And '${{ env.FILE_WITH_SUBSTITUTIONS }}' should match the expected file, which is the same as the original file
+        if: always()
+        run: |
+          expectedFileName="${{ env.EXPECTED_OUTPUT_FILE }}"
+          actualFileName="${{ env.FILE_WITH_SUBSTITUTIONS }}"
+          ./test/assert-file-contents-match.sh --expectedFileName $expectedFileName --actualFileName $actualFileName
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                              TEST 4 - FILE WITH MATCHING OCTOSTACHE TEMPLATES                               '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 4
+        if: always()
+        run: |
+          destinationDirectory="./test-results/matching-templates"
+          fileName="matching-octostache-templates.html"
+          expectedOutputFile="./test/expected-output/matching-templates.html"
+
+          # Create a directory and copy the file to the destination
+          # Make a copy so octostache can modify the file without changing the original
+          destinationFile="$destinationDirectory/$fileName"
+          originalFile="./test/input-files/$fileName"
+          mkdir -p $destinationDirectory
+          cp $originalFile $destinationFile
+
+          echo "FILE_WITH_SUBSTITUTIONS=$destinationFile" >> "$GITHUB_ENV"
+          echo "ORIGINAL_FILE=$originalFile" >> "$GITHUB_ENV"
+          echo "EXPECTED_OUTPUT_FILE=$expectedOutputFile" >> "$GITHUB_ENV"
+
+      - name: 4a - When octostache-action is called with a file that has octostache templates that do not match any inputs
+        id: matching-templates
+        if: always()
+        uses: ./
+        with:
+          files-with-substitutions: ${{ env.FILE_WITH_SUBSTITUTIONS }}
+          variables-file: ./test/input-files/substitution-variables.yml #(LaunchDarklyKey,GoogleAnalyticsKey,AppInsightsKey)
+        env:
+          ENVIRONMENT: Stage
+          VERSION: 1.3.62
+          # GITHUB_SERVER_URL (Default GitHub variable - https://github.com)
+          # WORKFLOW_LEVEL_ENV (workflow-level-env)
+          # JOB_LEVEL_ENV (job-level-env)
+
+      - name: 4b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.matching-templates.outcome }}"
+
+      - name: 4c - And '${{ env.FILE_WITH_SUBSTITUTIONS }}' should match the expected file, which has all the octostache templates replaced
+        if: always()
+        run: |
+          expectedFileName="${{ env.EXPECTED_OUTPUT_FILE }}"
+          actualFileName="${{ env.FILE_WITH_SUBSTITUTIONS }}"
+          ./test/assert-file-contents-match.sh --expectedFileName $expectedFileName --actualFileName $actualFileName
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                 TEST 5 - OVERRIDE INPUT FILE WITH ENV VARS                                  '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 5
+        if: always()
+        run: |
+          destinationDirectory="./test-results/override-variables"
+          fileName="override-variables.js"
+          expectedOutputFile="./test/expected-output/override-variables.js"
+
+          # Create a directory and copy the file to the destination
+          # Make a copy so octostache can modify the file without changing the original
+          destinationFile="$destinationDirectory/$fileName"
+          originalFile="./test/input-files/$fileName"
+          mkdir -p $destinationDirectory
+          cp $originalFile $destinationFile
+
+          echo "FILE_WITH_SUBSTITUTIONS=$destinationFile" >> "$GITHUB_ENV"
+          echo "ORIGINAL_FILE=$originalFile" >> "$GITHUB_ENV"
+          echo "EXPECTED_OUTPUT_FILE=$expectedOutputFile" >> "$GITHUB_ENV"
+
+      - name: 5a - When octostache-action is called with env vars that override the input variables
+        id: override-variables
+        if: always()
+        uses: ./
+        with:
+          files-with-substitutions: ${{ env.FILE_WITH_SUBSTITUTIONS }}
+          variables-file: ./test/input-files/substitution-variables.yml #(LaunchDarklyKey,GoogleAnalyticsKey,AppInsightsKey)
+        env:
+          LaunchDarklyKey: override_ld_key
+          GoogleAnalyticsKey: override_ga_key
+          AppInsightsKey: override_ai_key
+
+      - name: 5b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.override-variables.outcome }}"
+
+      - name: 5c - And '${{ env.FILE_WITH_SUBSTITUTIONS }}' should match the expected file, which replaced octostache templates with env var values
+        if: always()
+        run: |
+          expectedFileName="${{ env.EXPECTED_OUTPUT_FILE }}"
+          actualFileName="${{ env.FILE_WITH_SUBSTITUTIONS }}"
+          ./test/assert-file-contents-match.sh --expectedFileName $expectedFileName --actualFileName $actualFileName
+
+      - name: '-------------------------------------------------------------------------------------------------------------'
+        run: echo ""
+      - name: '                                TEST 6 - MULTIPLE FILES-WITH-SUBSTITUTIONS ARG                               '
+        run: echo ""
+
+      - name: Setup - Set variables for Test 6
+        if: always()
+        run: |
+          destinationDirectory="./test-results/multiple-files"
+
+          fileName1="matching-octostache-templates.html"
+          fileName2="override-variables.js"
+
+          expectedOutputFile1="./test/expected-output/matching-templates.html"
+          expectedOutputFile2="./test/expected-output/matching-templates.js"
+
+          # Create a directory and copy the file to the destination
+          # Make a copy so octostache can modify the file without changing the original
+          destinationFile1="$destinationDirectory/$fileName1"
+          destinationFile2="$destinationDirectory/$fileName2"
+
+          originalFile1="./test/input-files/$fileName1"
+          originalFile2="./test/input-files/$fileName2"
+
+          mkdir -p $destinationDirectory
+          cp $originalFile1 $destinationFile1
+          cp $originalFile2 $destinationFile2
+
+          echo "FILE_WITH_SUBSTITUTIONS_1=$destinationFile1" >> "$GITHUB_ENV"
+          echo "FILE_WITH_SUBSTITUTIONS_2=$destinationFile2" >> "$GITHUB_ENV"
+
+          echo "ORIGINAL_FILE_1=$originalFile1" >> "$GITHUB_ENV"
+          echo "ORIGINAL_FILE_2=$originalFile2" >> "$GITHUB_ENV"
+
+          echo "EXPECTED_OUTPUT_FILE_1=$expectedOutputFile1" >> "$GITHUB_ENV"
+          echo "EXPECTED_OUTPUT_FILE_2=$expectedOutputFile2" >> "$GITHUB_ENV"
+
+      - name: 6a - When octostache-action is called with env vars that override the input variables
+        id: override-variables
+        if: always()
+        uses: ./
+        with:
+          files-with-substitutions: ${{ env.FILE_WITH_SUBSTITUTIONS_1 }},${{ env.FILE_WITH_SUBSTITUTIONS_2 }}
+          variables-file: ./test/input-files/substitution-variables.yml #(LaunchDarklyKey,GoogleAnalyticsKey,AppInsightsKey)
+        env:
+          ENVIRONMENT: Stage
+          VERSION: 1.3.62
+          # GITHUB_SERVER_URL (Default GitHub variable - https://github.com)
+          # WORKFLOW_LEVEL_ENV (workflow-level-env)
+          # JOB_LEVEL_ENV (job-level-env)
+
+      - name: 6b - Then the action outcome should be success
+        if: always()
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.override-variables.outcome }}"
+
+      - name: 6c - And the touched files should match the expected files, which replaced octostache templates with env var & input values
+        if: always()
+        run: |
+          expectedFileName="${{ env.EXPECTED_OUTPUT_FILE_1 }}"
+          actualFileName="${{ env.FILE_WITH_SUBSTITUTIONS_1 }}"
+          ./test/assert-file-contents-match.sh --expectedFileName $expectedFileName --actualFileName $actualFileName
+
+          expectedFileName="${{ env.EXPECTED_OUTPUT_FILE_2 }}"
+          actualFileName="${{ env.FILE_WITH_SUBSTITUTIONS_2 }}"
+          ./test/assert-file-contents-match.sh --expectedFileName $expectedFileName --actualFileName $actualFileName

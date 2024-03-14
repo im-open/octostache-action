@@ -1,0 +1,62 @@
+<div>
+  <div>
+    <div>These replacements come from the variables-file</div>
+    <table>
+      <tr>
+        <td>LaunchDarklyKey</td>
+        <td>abc_launchDarkly</td>
+      </tr>
+      <tr>
+        <td>GoogleAnalyticsKey</td>
+        <td>123_googleAnalytics</td>
+      </tr>
+      <tr>
+        <td>AppInsightsKey</td>
+        <td>a1b2c3_appInsights</td>
+      </tr>
+  </div>
+  <div>
+    <div>These replacements come from the explicitly defined environment variables</div>
+    <table>
+      <tr>
+        <td>ENVIRONMENT</td>
+        <td>Stage</td>
+      </tr>
+      <tr>
+        <td>VERSION</td>
+        <td>1.3.62</td>
+      </tr>
+  </div>
+  <div>
+    <div>These replacements come from the default github environment, workflow-level and org-level variables</div>
+    <table>
+      <tr>
+        <td>Default GitHub environment variable - GITHUB_SERVER_URL</td>
+        <td>https://github.com</td>
+      </tr>
+      <tr>
+        <td>Workflow-level environment variable</td>
+        <td>workflow-level-env</td>
+      </tr>
+      <tr>
+        <td>Job-level environment variable</td>
+        <td>job-level-env</td>
+      </tr>
+  </div>
+  <div>
+    <div>These replacements will be made even though the case is wrong</div>
+    <table>
+      <tr>
+        <td>LaunchDarklyKey</td>
+        <td>abc_launchDarkly</td>
+      </tr>
+      <tr>
+        <td>ENVIRONMENT</td>
+        <td>Stage</td>
+      </tr>
+      <tr>
+        <td>GITHUB_SERVER_URL</td>
+        <td>https://github.com</td>
+      </tr>
+  </div>
+</div>
