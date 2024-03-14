@@ -22,7 +22,7 @@ namespace OctostacheCmd
             };
 
             rootCommand.Description =
-                "This program takes in a list of files with substitutions, an optional variables file, and an optional list of output files and performs variable substitution in the files using Octostache.";
+                "This program takes in a list of files with substitutions, an optional variables file, and performs variable substitution in the files using Octostache.";
 
 
             rootCommand.Handler = CommandHandler.Create<string, string>(processFile);
@@ -32,9 +32,9 @@ namespace OctostacheCmd
 
         static int processFile(string variablesFile, string filesWithSubstitutions)
         {
-            if (string.IsNullOrEmpty(filesWithSubstitutions))
+            if (string.IsNullOrEmpty(filesWithSubstitutions) || filesWithSubstitutions.Trim().Length == 0)
             {
-                Console.WriteLine("The template-files argument needs a value.");
+                Console.WriteLine("The files-with-substitutions argument needs a value.");
                 return 1;
             }
 
