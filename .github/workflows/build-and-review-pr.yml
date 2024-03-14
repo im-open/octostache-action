@@ -325,7 +325,7 @@ jobs:
           echo "EXPECTED_OUTPUT_FILE_2=$expectedOutputFile2" >> "$GITHUB_ENV"
 
       - name: 6a - When octostache-action is called with env vars that override the input variables
-        id: override-variables
+        id: multiple-files
         if: always()
         uses: ./
         with:
@@ -340,7 +340,7 @@ jobs:
 
       - name: 6b - Then the action outcome should be success
         if: always()
-        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.override-variables.outcome }}"
+        run: ./test/assert-values-match.sh --name "step outcome" --expected "success" --actual "${{ steps.multiple-files.outcome }}"
 
       - name: 6c - And the touched files should match the expected files, which replaced octostache templates with env var & input values
         if: always()
