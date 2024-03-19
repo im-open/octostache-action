@@ -63,3 +63,7 @@ Generated\ Files/
 ## Git conflict files
 #################
 *.orig
+
+## Action specific files
+/pull-request.json
+test-results/

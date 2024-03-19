@@ -2,7 +2,12 @@
 
 This action will scan the file(s) provided in the `files-with-substitutions` argument for Octopus variable substitution syntax `#{VariableName}`. If the files contain any `#{Variables}` that match an item in the `variables-file` or environment variables, it will replace the template with the actual value. If a variable is found in both the `variables-file` and in the environment variables, then the environment variable value will be used.
 
-This is a container action so it will not work on Windows runners.
+Some items to note:
+
+- This action will make modifications to any files in `files-with-substitutions` if matching Octostache templates are identified.
+- Substitutions can be defined in a `variables-file` or as environment variables.  
+  - The action will use [default GitHub environment variables] and environments variables set at the workflow, job or step level.
+- The action does not consider case when looking for Octostache templates to replace.  For example if a one of the files with substitutions contained `${launchdarkly}` and an env var was defined as `LAUNCHDARKLY`, the substitution would be made.
 
 ## Index<!-- omit in toc -->
 
@@ -26,7 +31,7 @@ This is a container action so it will not work on Windows runners.
 
 | Parameter                  | Is Required | Description                                                                                                                                                                                                                                  |
 |----------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `variables-file`           | false       | An optional yaml file containing variables to use in the substitution.                                                                                                                                                                       |
+| `variables-file`           | false       | An optional yaml file containing variables to use in the substitution.  The alternative is to define [environment variables] to use for the substitutions.                                                                                     |
 | `files-with-substitutions` | true        | A comma separated list of files or [.NET-compatible glob patterns](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.filesystemglobbing.matcher?view=dotnet-plat-ext-6.0#remarks) with `#{variables}` that need substitution. |
 
 ## Outputs
@@ -111,9 +116,9 @@ jobs:
       - uses: actions/checkout@v3
       
       # You may also reference just the major or major.minor version
-      - uses: im-open/octostache-action@v4.0.2
+      - uses: im-open/octostache-action@v4.0.3
         with:
-          variables-file: ./substitution-variables.json
+          variables-file: ./substitution-variables.yml
           files-with-substitutions: ./src/DemoApp19/DemoApp19.csproj,./src/DemoApp19/Bff/FrontEnd/scripts/build-variables.js,./src/**/*.html
         env:
           # Note that this value would be used over the value from the example variables file
@@ -168,7 +173,7 @@ This project has adopted the [im-open's Code of Conduct](https://github.com/im-o
 
 ## License
 
-Copyright &copy; 2023, Extend Health, LLC. Code released under the [MIT license](LICENSE).
+Copyright &copy; 2024, Extend Health, LLC. Code released under the [MIT license](LICENSE).
 
  <!-- Links -->
 [Incrementing the Version]: #incrementing-the-version
@@ -180,3 +185,5 @@ Copyright &copy; 2023, Extend Health, LLC. Code released under the [MIT license]
 [increment-version-on-merge]: ./.github/workflows/increment-version-on-merge.yml
 [esbuild]: https://esbuild.github.io/getting-started/#bundling-for-node
 [git-version-lite]: https://github.com/im-open/git-version-lite
+[default GitHub environment variables]: https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+[environment variables]: #environment-variables
