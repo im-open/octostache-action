@@ -16,6 +16,9 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - run: echo "hi!"
+      shell: bash
+      
     - name: Run the octostash project
       shell: pwsh
       run: |
